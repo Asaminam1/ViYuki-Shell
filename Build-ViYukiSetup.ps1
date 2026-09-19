@@ -5,6 +5,10 @@ $hostPublish = Join-Path $PSScriptRoot "artifacts\setup-host"
 $packagerPublish = Join-Path $PSScriptRoot "artifacts\packager"
 $setupPath = Join-Path $PSScriptRoot "artifacts\ViYukiSetup.exe"
 
+if (Test-Path -LiteralPath $appPublish) {
+    Remove-Item -LiteralPath $appPublish -Recurse -Force
+}
+
 dotnet publish $PSScriptRoot -c Release -r win-x64 --self-contained true --ignore-failed-sources -o $appPublish
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

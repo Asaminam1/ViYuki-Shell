@@ -28,14 +28,13 @@ public sealed class VersionCommand : ICommand
             return CommandResult.InvalidArguments;
         }
 
-        var templatePath = Path.Combine(AppContext.BaseDirectory, "Assets", "version.txt");
-        if (!File.Exists(templatePath))
+        if (!EmbeddedAssets.TryReadText("version.txt", out var template))
         {
-            Console.Error.WriteLine("version: display template is missing");
+            Console.Error.WriteLine("version: display template is unavailable");
             return CommandResult.ExecutionError;
         }
 
-        RenderFastfetch(context, File.ReadAllText(templatePath));
+        RenderFastfetch(context, template);
         ShowUpdateNotice();
         return CommandResult.Success;
     }

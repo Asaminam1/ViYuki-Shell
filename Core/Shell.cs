@@ -152,8 +152,12 @@ public sealed class Shell
     {
         var previousColor = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Magenta;
-        var bannerPath = Path.Combine(AppContext.BaseDirectory, "Assets", "banner.txt");
-        var banner = File.ReadAllText(bannerPath);
+        if (!EmbeddedAssets.TryReadText("banner.txt", out var banner))
+        {
+            Console.Error.WriteLine("ViYuki banner resource is unavailable.");
+            Console.ForegroundColor = previousColor;
+            return;
+        }
 
         var lines = new List<string>();
         using (var reader = new StringReader(banner))

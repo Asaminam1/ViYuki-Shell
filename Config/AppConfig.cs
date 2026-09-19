@@ -11,15 +11,22 @@ public sealed class AppConfig
     };
 
     public static string ConfigDirectory =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ViYuki");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ViYukiShell");
 
     public static string ConfigPath => Path.Combine(ConfigDirectory, "config.json");
+
+    private static string LegacyConfigPath => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "ViYuki",
+        "config.json");
 
     public static AppConfig LoadOrCreateDefault()
     {
         try
         {
             Directory.CreateDirectory(ConfigDirectory);
+
+            MigrateLegacyConfig();
 
             if (!File.Exists(ConfigPath))
             {
@@ -56,5 +63,16 @@ public sealed class AppConfig
             WriteIndented = true,
             PropertyNameCaseInsensitive = true
         };
+    }
+
+    private static void MigrateLegacyConfig()
+    {
+        if (File.Exists(ConfigPath) || !File.Exists(LegacyConfigPath))
+        {
+            return;
+        }
+
+        File.Copy(LegacyConfigPath, ConfigPath);
+        File.Delete(LegacyConfigPath);
     }
 }

@@ -21,7 +21,8 @@ static int Install()
         {
             Directory.CreateDirectory(installDirectory);
             ExtractPayloadToInstallDirectory(temporaryZip, installDirectory);
-            EnsureDefaultConfig(installDirectory);
+            RemoveObsoleteAssets(installDirectory);
+            MigrateLegacyConfig(installDirectory);
             AddToUserPath(installDirectory);
             CreateStartMenuShortcut(installDirectory);
 
@@ -78,13 +79,35 @@ static string ExtractPayload(string installerPath)
     return temporaryZip;
 }
 
-static void EnsureDefaultConfig(string installDirectory)
+static void RemoveObsoleteAssets(string installDirectory)
 {
-    var configPath = Path.Combine(installDirectory, "config.json");
+    var assetsDirectory = Path.Combine(installDirectory, "Assets");
+    if (Directory.Exists(assetsDirectory))
+    {
+        Directory.Delete(assetsDirectory, recursive: true);
+    }
+}
+
+static void MigrateLegacyConfig(string installDirectory)
+{
+    var legacyConfigPath = Path.Combine(installDirectory, "config.json");
+    if (!File.Exists(legacyConfigPath))
+    {
+        return;
+    }
+
+    var configDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "ViYukiShell");
+    var configPath = Path.Combine(configDirectory, "config.json");
+    Directory.CreateDirectory(configDirectory);
+
     if (!File.Exists(configPath))
     {
-        File.WriteAllText(configPath, "{\n  \"Aliases\": {\n    \"ll\": \"ls\",\n    \"cls\": \"clear\"\n  }\n}\n");
+        File.Copy(legacyConfigPath, configPath);
     }
+
+    File.Delete(legacyConfigPath);
 }
 
 static void ExtractPayloadToInstallDirectory(string zipPath, string installDirectory)

@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <AssemblyName>ViYuki</AssemblyName>
     <RootNamespace>ViYuki</RootNamespace>
-    <Version>1.17.0</Version>
-    <InformationalVersion>1.17</InformationalVersion>
+    <Version>1.18.0</Version>
+    <InformationalVersion>1.18</InformationalVersion>
     <ApplicationIcon>Assets\VY.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
@@ -19,7 +19,8 @@
     <Compile Remove="InstallerHost\**\*.cs;Packager\**\*.cs" />
     <None Update="Enable-ViYuki.cmd" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <None Update="vi.cmd" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <None Update="Assets\banner.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <None Update="Assets\version.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Remove="Assets\banner.txt;Assets\version.txt" />
+    <EmbeddedResource Include="Assets\banner.txt" />
+    <EmbeddedResource Include="Assets\version.txt" />
   </ItemGroup>
 </Project>
