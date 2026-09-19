@@ -13,6 +13,7 @@ var updateService = new GitHubUpdateService();
 registry.Register(new HelpCommand(registry));
 registry.Register(new VersionCommand(updateService));
 registry.Register(new UpdateCommand(updateService));
+registry.Register(new SysInfoCommand());
 registry.Register(new ExitCommand());
 registry.Register(new ClearCommand());
 registry.Register(new CdCommand());

@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <AssemblyName>ViYuki</AssemblyName>
     <RootNamespace>ViYuki</RootNamespace>
-    <Version>1.13.0</Version>
-    <InformationalVersion>1.13</InformationalVersion>
+    <Version>1.14.0</Version>
+    <InformationalVersion>1.14</InformationalVersion>
     <ApplicationIcon>Assets\VY.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
