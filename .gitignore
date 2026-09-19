@@ -1,0 +1,43 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Aa]rtifacts/
+.vs/
+TestResults/
+*.nupkg
+*.snupkg
+
+# IDE and local user state
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local configuration and secrets
+config.json
+appsettings.Local.json
+*.local.json
+.env
+.env.*
+!.env.example
+secrets.json
+*.pfx
+*.p12
+*.pem
+*.key
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.cache
+*.pid
+a.out
+name.txt
+
+# Operating system files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
