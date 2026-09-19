@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using ViYuki.Core;
 
 namespace ViYuki.SystemIntegration;
@@ -32,8 +33,8 @@ public sealed class GitHubUpdateService
             return null;
         }
 
-        var asset = release.Assets.FirstOrDefault(asset =>
-            asset.Name.Equals(AppInfo.SetupAssetName, StringComparison.OrdinalIgnoreCase));
+        var asset = (release.Assets ?? []).FirstOrDefault(asset =>
+            string.Equals(asset.Name, AppInfo.SetupAssetName, StringComparison.OrdinalIgnoreCase));
         if (asset is null || !Uri.TryCreate(asset.BrowserDownloadUrl, UriKind.Absolute, out var downloadUri))
         {
             return null;
@@ -82,9 +83,10 @@ public sealed class GitHubUpdateService
         return Version.Parse(AppInfo.Version);
     }
 
-    private static bool TryParseVersion(string tagName, out Version version)
+    private static bool TryParseVersion(string? tagName, out Version version)
     {
-        if (Version.TryParse(tagName.Trim().TrimStart('v', 'V'), out var parsedVersion))
+        if (!string.IsNullOrWhiteSpace(tagName) &&
+            Version.TryParse(tagName.Trim().TrimStart('v', 'V'), out var parsedVersion))
         {
             version = parsedVersion;
             return true;
@@ -94,9 +96,15 @@ public sealed class GitHubUpdateService
         return false;
     }
 
-    private sealed record GitHubRelease(string TagName, bool Draft, bool Prerelease, IReadOnlyList<GitHubAsset> Assets);
+    private sealed record GitHubRelease(
+        [property: JsonPropertyName("tag_name")] string? TagName,
+        bool Draft,
+        bool Prerelease,
+        IReadOnlyList<GitHubAsset>? Assets);
 
-    private sealed record GitHubAsset(string Name, string BrowserDownloadUrl);
+    private sealed record GitHubAsset(
+        string? Name,
+        [property: JsonPropertyName("browser_download_url")] string? BrowserDownloadUrl);
 }
 
 public sealed record UpdateRelease(Version Version, Uri DownloadUri);
