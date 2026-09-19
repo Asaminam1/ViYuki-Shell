@@ -5,7 +5,7 @@ namespace ViYuki.Core;
 public static class AppInfo
 {
     public const string Name = "ViYuki Shell";
-    public const string FallbackVersion = "1.15";
+    public const string FallbackVersion = "1.16";
     public const string RepositoryOwner = "Asaminam1";
     public const string RepositoryName = "ViYuki-Shell";
     public const string SetupAssetName = "ViYukiSetup.exe";
