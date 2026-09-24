@@ -7,10 +7,13 @@ public sealed class CommandLineReader
 {
     private readonly List<string> _history = [];
     private readonly ITabCompleter _tabCompleter;
+    private readonly CommandHistory _commandHistory;
 
     public CommandLineReader(ITabCompleter tabCompleter)
     {
         _tabCompleter = tabCompleter;
+        _commandHistory = new CommandHistory();
+        _history.AddRange(_commandHistory.Load());
     }
 
     public string? ReadLine(Prompt prompt)
@@ -34,6 +37,12 @@ public sealed class CommandLineReader
                     if (!string.IsNullOrWhiteSpace(line))
                     {
                         _history.Add(line);
+                        if (_history.Count > CommandHistory.MaximumEntries)
+                        {
+                            _history.RemoveRange(0, _history.Count - CommandHistory.MaximumEntries);
+                        }
+
+                        _commandHistory.Save(_history);
                     }
 
                     return line;
