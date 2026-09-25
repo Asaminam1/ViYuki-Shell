@@ -11,6 +11,8 @@ public sealed class CommandContext
 
     public bool ShouldExit { get; private set; }
 
+    public CancellationToken CancellationToken { get; internal set; } = CancellationToken.None;
+
     public string CurrentDirectory
     {
         get => Environment.CurrentDirectory;

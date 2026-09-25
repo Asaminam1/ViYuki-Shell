@@ -1,6 +1,7 @@
 using ViYuki.Commands;
 using ViYuki.Config;
 using ViYuki.Core;
+using ViYuki.Search;
 using ViYuki.SystemIntegration;
 using System.Text;
 
@@ -9,12 +10,14 @@ var config = AppConfig.LoadOrCreateDefault();
 var parser = new CommandParser();
 var registry = new CommandRegistry(config.Aliases);
 var updateService = new GitHubUpdateService();
+var searchProvider = new FastFileSystemSearchProvider();
 
 registry.Register(new HelpCommand(registry));
 registry.Register(new VersionCommand(updateService));
 registry.Register(new UpdateCommand(updateService));
 registry.Register(new SysInfoCommand());
 registry.Register(new KillCommand());
+registry.Register(new SearchCommand(searchProvider));
 registry.Register(new ExitCommand());
 registry.Register(new ClearCommand());
 registry.Register(new CdCommand());
@@ -27,7 +30,10 @@ var shell = new Shell(registry, parser, externalExecutor);
 Console.CancelKeyPress += (_, eventArgs) =>
 {
     eventArgs.Cancel = true;
-    shell.RequestExit();
+    if (!shell.TryCancelActiveCommand())
+    {
+        shell.RequestExit();
+    }
 };
 
 if (args.Length == 0)

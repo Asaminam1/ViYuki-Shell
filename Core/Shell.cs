@@ -10,6 +10,7 @@ public sealed class Shell
     private readonly CommandParser _parser;
     private readonly ExternalCommandExecutor _externalExecutor;
     private readonly CommandLineReader _reader;
+    private CancellationTokenSource? _activeCommandCancellation;
     private bool _exitRequested;
 
     public Shell(CommandRegistry registry, CommandParser parser, ExternalCommandExecutor externalExecutor)
@@ -63,6 +64,25 @@ public sealed class Shell
         _exitRequested = true;
     }
 
+    public bool TryCancelActiveCommand()
+    {
+        var cancellation = Volatile.Read(ref _activeCommandCancellation);
+        if (cancellation is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            cancellation.Cancel();
+            return true;
+        }
+        catch (ObjectDisposedException)
+        {
+            return false;
+        }
+    }
+
     private int ExecuteInput(CommandContext context, string input)
     {
         Console.WriteLine();
@@ -95,14 +115,31 @@ public sealed class Shell
 
         if (_registry.TryResolve(parsed.Name, out var command))
         {
+            CancellationTokenSource? cancellation = null;
             try
             {
+                if (command.SupportsCancellation)
+                {
+                    cancellation = new CancellationTokenSource();
+                    context.CancellationToken = cancellation.Token;
+                    Interlocked.Exchange(ref _activeCommandCancellation, cancellation);
+                }
+
                 return command.Execute(context, parsed.Arguments);
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"viyuki: {command.Name}: {ex.Message}");
                 return CommandResult.ExecutionError;
+            }
+            finally
+            {
+                if (cancellation is not null)
+                {
+                    Interlocked.CompareExchange(ref _activeCommandCancellation, null, cancellation);
+                    context.CancellationToken = CancellationToken.None;
+                    cancellation.Dispose();
+                }
             }
         }
 

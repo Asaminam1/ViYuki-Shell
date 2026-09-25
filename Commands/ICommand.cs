@@ -12,5 +12,7 @@ public interface ICommand
 
     string Usage => Name;
 
+    bool SupportsCancellation => false;
+
     int Execute(CommandContext context, IReadOnlyList<string> args);
 }
